@@ -12,7 +12,10 @@ android {
 				arguments "-DANDROID_STL=c++_shared",
 					"-DENABLE_CURL=1", "-DENABLE_SOUND=1",
 					"-DENABLE_GETTEXT=1",
-					"-DBUILD_UNITTESTS=0", "-DENABLE_UPDATE_CHECKER=0"
+					"-DBUILD_UNITTESTS=0", "-DENABLE_UPDATE_CHECKER=0",
+					// 启用 ccache（CI 中会安装并放入 PATH；本地没有 ccache 时需自行安装或去掉这两行）
+					"-DCMAKE_C_COMPILER_LAUNCHER=ccache",
+					"-DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 			}
 		}
 	}
@@ -23,7 +26,7 @@ android {
 		}
 	}
 
-	// supported architectures
+	// 只构建 arm64-v8a
 	splits {
 		abi {
 			enable true
@@ -43,8 +46,8 @@ android {
 }
 
 def depsDir = layout.buildDirectory.dir("../deps").get().asFile
-// need to do the check here so we can properly skip both tasks
-if (new File(depsDir, 'armeabi-v7a').exists()) {
+// 检查 arm64 依赖是否已存在
+if (new File(depsDir, 'arm64-v8a').exists()) {
 	tasks.register('getDeps') {
 		doLast { logger.lifecycle('Using existing deps from {}', depsDir) }
 	}
