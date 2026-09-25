@@ -1,8 +1,7 @@
 name: android
 
-# build on c/cpp changes or workflow changes
 on:
-  workflow_dispatch:    
+  workflow_dispatch:
   push:
     paths:
       - 'lib/**.[ch]'
@@ -47,33 +46,37 @@ jobs:
     - name: Set up JDK 17
       uses: actions/setup-java@v5
       with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'          # Gradle 依赖缓存
+        distribution: 'temurin'
+        java-version: '17'
+
+    # 比 setup-java 自带的 cache: gradle 更完善
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: false          # 允许写入缓存
 
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
-        key: android-arm64-${{ runner.os }}
+        key: android-arm64-debug-${{ runner.os }}
         max-size: 1G
         verbose: 1
 
-    - name: Build AAB with Gradle
-      # We build an AAB as well for uploading to the Play Store.
-      run: cd android; ./gradlew bundlerelease
+    # 缓存预编译的 native deps（最大收益点之一）
+    - name: Cache Android native deps
+      uses: actions/cache@v4
+      with:
+        path: android/deps
+        key: android-deps-arm64-${{ hashFiles('android/native/build.gradle') }}
+        restore-keys: |
+          android-deps-arm64-
 
-    - name: Build APK with Gradle
-      # "assemblerelease" is very fast after "bundlerelease".
-      run: cd android; ./gradlew assemblerelease
+    - name: Build Debug APK (arm64 only)
+      run: cd android; ./gradlew assembleDebug --build-cache
 
-    - name: Save AAB artifact
+    - name: Save arm64 Debug APK
       uses: actions/upload-artifact@v7
       with:
-        name: Luanti-release.aab
-        path: android/app/build/outputs/bundle/release/app-release.aab
-
-    - name: Save arm64 artifact
-      uses: actions/upload-artifact@v7
-      with:
-        name: Luanti-arm64-v8a.apk
-        path: android/app/build/outputs/apk/release/app-arm64-v8a-release-unsigned.apk
+        name: Luanti-arm64-v8a-debug.apk
+        path: android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+        if-no-files-found: error
