@@ -50,22 +50,21 @@ void MapgenRandomizer::randomizeNodes()
 	if (!vm || !ndef)
 		return;
 
-	// Collect valid candidate node contents for replacement
 	std::vector<content_t> replace_candidates;
-	const content_t max_id = ndef->getLargestId();
-	for (content_t id = 0; id <= max_id; ++id) {
+	const u32 num_nodes = ndef->size();
+	for (content_t id = 0; id < num_nodes; ++id) {
 		const ContentFeatures &f = ndef->get(id);
 		if (f.name.empty() || f.name == "ignore" || f.name == "air")
 			continue;
-		if (f.drawtype == NDT_NORMAL && !f.groups.count("not_in_creative_inventory")) {
+		if (f.drawtype == NDT_NORMAL &&
+				f.getGroup("not_in_creative_inventory") != 1 &&
+				f.getGroup("falling_node") != 1) {
 			replace_candidates.push_back(id);
 		}
 	}
 
 	if (replace_candidates.empty())
 		return;
-
-	const v3s32 &em = vm->m_area.getExtent();
 
 	for (pos_t z = node_min.Z; z <= node_max.Z; z++) {
 		for (pos_t y = node_min.Y; y <= node_max.Y; y++) {
