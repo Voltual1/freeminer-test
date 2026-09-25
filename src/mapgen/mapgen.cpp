@@ -43,8 +43,9 @@
 #include "mapgen_voxel_earth.h"
 #include "mapgen_erosion.h"
 #include "mapgen_terraindiffusion.h"
+#include "mapgen_randomizer.h"
 #include "serverenvironment.h"
-
+// ===
 
 const FlagDesc flagdesc_mapgen[] = {
 	{"caves",       MG_CAVES},
@@ -103,6 +104,7 @@ static MapgenDesc g_reg_mapgens[] = {
 				false
 #endif
 		},
+		{"randomizer", true},
 		// ===
 
 		{"v7",         true},
@@ -202,6 +204,10 @@ Mapgen *Mapgen::createMapgen(MapgenType mgtype, MapgenParams *params,
 	case MAPGEN_TERRAIN_DIFFUSION:
 		return new MapgenTerrainDiffusion(
 				(MapgenTerrainDiffusionParams *)params, emerge);
+	// fm:
+	case MAPGEN_RANDOMIZER:
+		return new MapgenRandomizer((MapgenRandomizerParams *)params, emerge);
+	// ===
 
 	case MAPGEN_CARPATHIAN:
 		return new MapgenCarpathian((MapgenCarpathianParams *)params, emerge);
@@ -241,6 +247,10 @@ MapgenParams *Mapgen::createMapgenParams(MapgenType mgtype)
 		return new MapgenErosionParams;
 	case MAPGEN_TERRAIN_DIFFUSION:
 		return new MapgenTerrainDiffusionParams;
+	// fm:
+	case MAPGEN_RANDOMIZER:
+		return new MapgenRandomizerParams;
+	// ===
 
 	case MAPGEN_CARPATHIAN:
 		return new MapgenCarpathianParams;
@@ -811,8 +821,8 @@ void MapgenBasic::generateBiomes()
 				// This is done by aborting the cycle of top/filler placement
 				// immediately by forcing nplaced to stone level.
 				if (c_below == CONTENT_AIR
-						|| c_below == c_water_source
-						|| c_below == c_river_water_source)
+| c_below == c_water_source
+| c_below == c_river_water_source)
 					nplaced = U16_MAX;
 
 				if (river_water_above) {

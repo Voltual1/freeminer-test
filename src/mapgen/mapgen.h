@@ -105,13 +105,14 @@ private:
 
 // Order must match the order of 'static MapgenDesc g_reg_mapgens[]' in mapgen.cpp
 enum MapgenType {
-	// freeminer:
+	// fm:
 	MAPGEN_EARTH,
 	MAPGEN_VOXEL_EARTH,
 	MAPGEN_MATH,
 	MAPGEN_INDEV,
 	MAPGEN_EROSION,
 	MAPGEN_TERRAIN_DIFFUSION,
+	MAPGEN_RANDOMIZER,
     // ==========
 
 	MAPGEN_V7,

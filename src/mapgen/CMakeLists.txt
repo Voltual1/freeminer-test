@@ -1,3 +1,4 @@
+// fm:
 set(freeminer_mapgen_SRCS
     ${freeminer_mapgen_SRCS}
 	${CMAKE_CURRENT_SOURCE_DIR}/earth/hgt.cpp
@@ -9,7 +10,9 @@ set(freeminer_mapgen_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/mapgen_terraindiffusion_native.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mapgen_indev.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mapgen_math.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/mapgen_randomizer.cpp
 )
+// ===
 add_subdirectory(earth)
 set(FREEMINER_SERVER_LIBRARIES ${FREEMINER_SERVER_LIBRARIES} PARENT_SCOPE)
 set(FREEMINER_CLIENT_LIBRARIES ${FREEMINER_CLIENT_LIBRARIES} PARENT_SCOPE)
